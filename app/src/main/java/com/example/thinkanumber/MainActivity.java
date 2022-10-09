@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,18 +31,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         init();
 
-        //ujJatek();
+        ujJatek();
 
         buttonTippel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (gondolSzam < tippeltSzam) {
                     Toast.makeText(MainActivity.this, "Gondolt szám kisebb", Toast.LENGTH_SHORT).show();
+                    egyediToast.show();
                     eletlevon();
                 } else if (gondolSzam > tippeltSzam){
                     Toast.makeText(MainActivity.this, "Gondolt szám nagyobb", Toast.LENGTH_SHORT).show();
+                    egyediToast.show();
                     eletlevon();
                 } else {
+                    builderJatekVege.setTitle("Nyerél").create();
                     builderJatekVege.show();
                 }
             }
@@ -67,9 +72,56 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        buttonKonnyu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nehezseg = false;
+                builderNehezseg.setTitle("Könnyű");
+                builderNehezseg.create();
+                builderNehezseg.show();
+            }
+        });
+        buttonNehez.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nehezseg = true;
+                builderNehezseg.setTitle("Nehéz");
+                builderNehezseg.create();
+                builderNehezseg.show();
+            }
+        });
+
+
+
+
     }
 
+    private void ujJatek() {
+        maxSzam = 10;
+        Random rnd = new Random();
+        gondolSzam = rnd.nextInt(maxSzam) +1;
+        elet = 3;
+        tippeltSzam = 0;
+        textViewTipp.setText(String.valueOf(tippeltSzam));
+        elet1.setImageResource(R.drawable.heart2);
+        elet2.setImageResource(R.drawable.heart2);
+        elet3.setImageResource(R.drawable.heart2);
+        elet4.setImageResource(R.drawable.heart2);
+        elet5.setImageResource(R.drawable.heart2);
+        if (nehezseg) {
+            maxSzam = 40;
+            gondolSzam = rnd.nextInt(maxSzam) +1;
+            elet4.setVisibility(View.VISIBLE);
+            elet5.setVisibility(View.VISIBLE);
+            elet = 5;
+            tippeltSzam = 0;
+        }
+        else {
+            elet4.setVisibility(View.GONE);
+            elet5.setVisibility(View.GONE);
+        }
 
+    }
     private void eletlevon() {
         //okositas péteken
         switch (elet) {
@@ -94,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         elet--;
 
         if (elet <1) {
+            builderJatekVege.setTitle("Vesztettél").create();
             builderJatekVege.show();
         }
     }
@@ -111,11 +164,8 @@ public class MainActivity extends AppCompatActivity {
         buttonNehez = findViewById(R.id.buttonNehez);
         buttonTippel = findViewById(R.id.buttonTipp);
 
-        maxSzam = 10;
-        Random rnd = new Random();
-        gondolSzam = rnd.nextInt(maxSzam) +1;
-        elet = 5;
-        tippeltSzam = 0;
+
+        nehezseg = false;
         builderJatekVege = new AlertDialog.Builder(MainActivity.this);
         builderJatekVege.setCancelable(false)
                 .setTitle("Nyert / vesztett")
@@ -129,10 +179,36 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("igen", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //ujJatek();
+                        ujJatek();
                     }
                 })
                 .create();
+        //Játék nehézség felugró ablak
+        builderNehezseg = new AlertDialog.Builder(MainActivity.this);
+        builderNehezseg.setCancelable(false)
+                .setTitle("Nehéz / köönyü")
+                .setMessage("Szeretné változtatni a nehézséget? ")
+                .setNegativeButton("nem", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                        ujJatek();
+                    }
+                })
+                .setPositiveButton("igen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ujJatek();
+                    }
+                })
+                .create();
+
+        egyediToast = new Toast(MainActivity.this);
+        egyediToast.setDuration(Toast.LENGTH_SHORT);
+        View view = getLayoutInflater().inflate(R.layout.egyedi_toast, findViewById(R.id.customToast));
+        egyediToast.setView(view);
+        egyediToast.setGravity(Gravity.CENTER, 0,0);
+
     }
 
 }
